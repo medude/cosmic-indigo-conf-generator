@@ -38,7 +38,7 @@ public class Main extends JPanel implements ActionListener {
 		resChooserButton = new JButton("Select /res folder");
 		resChooserButton.addActionListener(this);
 		
-		createFileButton = new JButton("Press to create .conf file");
+		createFileButton = new JButton("Press to generate .conf file");
 		createFileButton.addActionListener(this);
 		
 		JPanel buttonPanel = new JPanel();
@@ -48,18 +48,21 @@ public class Main extends JPanel implements ActionListener {
 		confFileName = new JTextField(20);
 		windowName = new JTextField(20);
 		
-		JPanel bodyPanel = new JPanel();
-		bodyPanel.add(new JLabel("Filename: "),
+		JPanel bodyPanel1 = new JPanel();
+		bodyPanel1.add(new JLabel("Filename: "),
 			    BorderLayout.WEST);
-		bodyPanel.add(confFileName);
-		bodyPanel.add(new JLabel(".conf"),
+		bodyPanel1.add(confFileName);
+		bodyPanel1.add(new JLabel(".conf"),
 			    BorderLayout.WEST);
-		bodyPanel.add(new JLabel("   Window name: "),
+		
+		JPanel bodyPanel2 = new JPanel();
+		bodyPanel2.add(new JLabel("   Window name: "),
 			    BorderLayout.WEST);
-		bodyPanel.add(windowName);
+		bodyPanel2.add(windowName);
 		
 		add(buttonPanel, BorderLayout.PAGE_START);
-		add(bodyPanel, BorderLayout.CENTER);
+		add(bodyPanel1, BorderLayout.CENTER);
+		add(bodyPanel2, BorderLayout.SOUTH);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
