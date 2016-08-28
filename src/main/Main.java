@@ -86,11 +86,7 @@ public class Main extends JPanel implements ActionListener {
 
 			for (int i = 0; i < listOfImages.length; i++) {
 				if (listOfImages[i].isFile()) {
-					if (listOfImages[i].getName().contains("."))
-						imageNames.add(
-								listOfImages[i].getName().substring(0, listOfImages[i].getName().lastIndexOf('.')));
-					else
-						imageNames.add(listOfImages[i].getName());
+					imageNames.add(listOfImages[i].getName());
 				}
 			}
 			imageNames = removeDuplicates(imageNames);
@@ -101,11 +97,7 @@ public class Main extends JPanel implements ActionListener {
 
 			for (int i = 0; i < listOfModels.length; i++) {
 				if (listOfModels[i].isFile()) {
-					if (listOfModels[i].getName().contains("."))
-						modelsNames.add(
-								listOfModels[i].getName().substring(0, listOfModels[i].getName().lastIndexOf('.')));
-					else
-						modelsNames.add(listOfModels[i].getName());
+					modelsNames.add(listOfModels[i].getName());
 				}
 			}
 			modelsNames = removeDuplicates(modelsNames);
