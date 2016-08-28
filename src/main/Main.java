@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -16,6 +17,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import apis.errorHandle.ErrorHandle;
+import externalLibraries.minimalJson.main.Json;
+import externalLibraries.minimalJson.main.JsonArray;
+import externalLibraries.minimalJson.main.JsonObject;
+import externalLibraries.minimalJson.main.JsonValue;
 import gui.Window;
 
 public class Main extends JPanel implements ActionListener {
@@ -38,7 +44,7 @@ public class Main extends JPanel implements ActionListener {
 		resChooserButton = new JButton("Select /res folder");
 		resChooserButton.addActionListener(this);
 		
-		createFileButton = new JButton("Press to generate .conf file");
+		createFileButton = new JButton("Press to generate .json file");
 		createFileButton.addActionListener(this);
 		
 		JPanel buttonPanel = new JPanel();
@@ -52,7 +58,7 @@ public class Main extends JPanel implements ActionListener {
 		bodyPanel1.add(new JLabel("Filename: "),
 			    BorderLayout.WEST);
 		bodyPanel1.add(confFileName);
-		bodyPanel1.add(new JLabel(".conf"),
+		bodyPanel1.add(new JLabel(".json"),
 			    BorderLayout.WEST);
 		
 		JPanel bodyPanel2 = new JPanel();
@@ -74,93 +80,88 @@ public class Main extends JPanel implements ActionListener {
 				resLocation = resChooser.getSelectedFile();
 			}
 		} else if(e.getSource() == createFileButton) {
-				File images = new File(resLocation.toString() + "/images");
-				File[] listOfImages = images.listFiles();
-				ArrayList<String> imageNames = new ArrayList<String>();
-				
-				for(int i = 0; i < listOfImages.length; i++) {
-			    	if(listOfImages[i].isFile()) {
-			    		if(listOfImages[i].getName().contains("."))
-			    			imageNames.add(listOfImages[i].getName().substring(0, listOfImages[i].getName().lastIndexOf('.')));
-			    		else
-			    			imageNames.add(listOfImages[i].getName());
-			    	}
-			    }
-				imageNames = removeDuplicates(imageNames);
-			    
-			    File models = new File(resLocation.toString() + "/models");
-			    File[] listOfModels = models.listFiles();
-			    ArrayList<String> modelsNames = new ArrayList<String>();
-			    
-			    for(int i = 0; i < listOfModels.length; i++) {
-			    	if(listOfModels[i].isFile()) {
-			    		if(listOfModels[i].getName().contains("."))
-			    			modelsNames.add(listOfModels[i].getName().substring(0, listOfModels[i].getName().lastIndexOf('.')));
-			    		else
-			    			modelsNames.add(listOfModels[i].getName());
-			    	}
-			    }
-			    modelsNames = removeDuplicates(modelsNames);
-			    
-			    File shaders = new File(resLocation.toString() + "/shaders");
-			    File[] listOfShaders = shaders.listFiles();
-			    ArrayList<String> shadersNames = new ArrayList<String>();
-			    
-			    for(int i = 0; i < listOfModels.length; i++) {
-			    	if(listOfShaders[i].isFile()) {
-			    		if(listOfShaders[i].getName().contains("."))
-			    			shadersNames.add(listOfShaders[i].getName().substring(0, listOfShaders[i].getName().lastIndexOf('.')));
-			    		else
-			    			shadersNames.add(listOfShaders[i].getName());
-			    	}
-			    }
-			    shadersNames = removeDuplicates(shadersNames);
-			    
-			    PrintWriter confFile = null;
-			    try {
-					confFile = new PrintWriter(resLocation.toString() + "/config/" + filename + ".conf", "UTF-8");
-				} catch(FileNotFoundException e1) {
-					e1.printStackTrace();
-				} catch(UnsupportedEncodingException e1) {
-					e1.printStackTrace();
+			File images = new File(resLocation.toString() + "/images");
+			File[] listOfImages = images.listFiles();
+			ArrayList<String> imageNames = new ArrayList<String>();
+
+			for (int i = 0; i < listOfImages.length; i++) {
+				if (listOfImages[i].isFile()) {
+					if (listOfImages[i].getName().contains("."))
+						imageNames.add(
+								listOfImages[i].getName().substring(0, listOfImages[i].getName().lastIndexOf('.')));
+					else
+						imageNames.add(listOfImages[i].getName());
 				}
-				
-				confFile.println("v.1.0.0");
-			    
-			    confFile.println("texture.total");
-			    confFile.println(imageNames.size());
-			    
-			    for(int i = 0; i < imageNames.size(); i++) {
-			    	confFile.println("texture." + i);
-			    	confFile.println(imageNames.get(i));
-			    }
-			    
-			    
-			    confFile.println("model.total");
-			    confFile.println(modelsNames.size());
-			    
-			    for(int i = 0; i < modelsNames.size(); i++) {
-			    	confFile.println("model." + i);
-			    	confFile.println(modelsNames.get(i));
-			    }
-			    
-			    
-			    confFile.println("shader.total");
-			    confFile.println(shadersNames.size());
-			    
-			    for(int i = 0; i < shadersNames.size(); i++) {
-			    	confFile.println("shader." + i);
-			    	confFile.println(shadersNames.get(i));
-			    }
-			    
-			    confFile.println("window.title");
-			    confFile.print(windowName.getText());
-			    
-			    confFile.close();
+			}
+			imageNames = removeDuplicates(imageNames);
+
+			File models = new File(resLocation.toString() + "/models");
+			File[] listOfModels = models.listFiles();
+			ArrayList<String> modelsNames = new ArrayList<String>();
+
+			for (int i = 0; i < listOfModels.length; i++) {
+				if (listOfModels[i].isFile()) {
+					if (listOfModels[i].getName().contains("."))
+						modelsNames.add(
+								listOfModels[i].getName().substring(0, listOfModels[i].getName().lastIndexOf('.')));
+					else
+						modelsNames.add(listOfModels[i].getName());
+				}
+			}
+			modelsNames = removeDuplicates(modelsNames);
+
+			File shaders = new File(resLocation.toString() + "/shaders");
+			File[] listOfShaders = shaders.listFiles();
+			ArrayList<String> shadersNames = new ArrayList<String>();
+
+			for (int i = 0; i < listOfModels.length; i++) {
+				if (listOfShaders[i].isFile()) {
+					if (listOfShaders[i].getName().contains("."))
+						shadersNames.add(
+								listOfShaders[i].getName().substring(0, listOfShaders[i].getName().lastIndexOf('.')));
+					else
+						shadersNames.add(listOfShaders[i].getName());
+				}
+			}
+			shadersNames = removeDuplicates(shadersNames);
+
+			PrintWriter confFile = null;
+			try {
+				confFile = new PrintWriter(resLocation.toString() + "/config/" + filename + ".json", "UTF-8");
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
+
+			JsonValue version = Json.value("v2.0.0");
+
+			String[] finalTexturesArray = imageNames.toArray(new String[imageNames.size()]);
+			JsonArray finalTextures = Json.array(finalTexturesArray);
+
+			String[] finalModelsArray = modelsNames.toArray(new String[modelsNames.size()]);
+			JsonArray finalModels = Json.array(finalModelsArray);
+
+			String[] finalShadersArray = shadersNames.toArray(new String[shadersNames.size()]);
+			JsonArray finalShaders = Json.array(finalShadersArray);
+
+			JsonValue windowTitle = Json.value(windowName.getText());
+
+			JsonObject json = Json.object().add("version", version).add("textures", finalTextures)
+					.add("models", finalModels).add("shaders", finalShaders).add("windowTitle", windowTitle);
+
+			try {
+				json.writeTo(confFile);
+			} catch (IOException e1) {
+				ErrorHandle.handle(e1);
+			} finally {
+				confFile.close();
+			}
 		}
 	}
 
 	
+
 	public ArrayList<String> removeDuplicates(ArrayList<String> list) {
 
 		// Store unique items in result.
